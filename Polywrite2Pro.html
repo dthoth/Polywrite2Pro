@@ -1,0 +1,863 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>PolyWrite2 Pro</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 20px;
+      }
+
+      .header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding-bottom: 20px;
+      }
+
+      .editor-container {
+        margin-bottom: 20px;
+      }
+
+      .editor {
+        height: 300px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        padding: 10px;
+        resize: vertical;
+        overflow: auto;
+        margin-bottom: 10px;
+      }
+
+      #editor1 {
+        height: 400px;
+      }
+
+      .column-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 20px;
+      }
+
+      .column {
+        flex: 1;
+      }
+
+      @media (max-width: 768px) {
+        /* Change to row layout for medium screens */
+        .column-container {
+          grid-template-columns: repeat(1, 1fr);
+          gap: 0px;
+        }
+      }
+
+      .file-list {
+        max-height: 150px;
+        overflow-y: auto;
+        border: 1px solid #ccc;
+        margin: 0px;
+        padding: 5px;
+        background-color: #f1f1f1;
+        border-radius: 5px;
+      }
+
+      .file-list li {
+        cursor: pointer;
+        padding: 5px;
+        transition: 0.3s;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .file-list li:hover {
+        background-color: #ddd;
+      }
+
+      .active-file {
+        background-color: #d8d9ff;
+      }
+
+      .button {
+        background-color: #4caf50;
+        color: white;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: 0.3s;
+        margin-right: 10px;
+        margin-bottom: 10px;
+      }
+
+      .button:hover {
+        background-color: #45a049;
+      }
+
+      .toolbar button {
+        background-color: #f1f1f1;
+        border: none;
+        color: black;
+        padding: 8px 16px;
+        text-align: center;
+        text-decoration: none;
+        display: inline-block;
+        font-size: 14px;
+        cursor: pointer;
+        border-radius: 4px;
+        transition: 0.3s;
+        margin-right: 10px;
+        margin-bottom: 10px;
+      }
+
+      .toolbar button:hover {
+        background-color: #ddd;
+      }
+
+      .file-actions {
+        display: flex;
+      }
+
+      .file-actions button {
+        background-color: #f1f1f1;
+        border: none;
+        color: black;
+        padding: 4px 8px;
+        text-align: center;
+        text-decoration: none;
+        display: inline-block;
+        font-size: 12px;
+        margin-left: 5px;
+        cursor: pointer;
+        border-radius: 4px;
+        transition: 0.3s;
+      }
+
+      .file-actions button:hover {
+        background-color: #ddd;
+      }
+
+      .remove-editor-button {
+        background-color: #f44336;
+        color: white;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: 0.3s;
+      }
+
+      .remove-editor-button:hover {
+        background-color: #d32f2f;
+      }
+
+      .last-modified {
+        padding: 4px 8px;
+        text-align: center;
+        text-decoration: none;
+        display: inline-block;
+        font-size: 12px;
+      }
+
+      .switch {
+        position: relative;
+        display: inline-block;
+        width: 60px;
+        height: 34px;
+      }
+
+      .switch input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+      }
+
+      .slider {
+        position: absolute;
+        cursor: pointer;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: #ccc;
+        -webkit-transition: 0.4s;
+        transition: 0.4s;
+      }
+
+      .slider:before {
+        position: absolute;
+        content: "";
+        height: 26px;
+        width: 26px;
+        left: 4px;
+        bottom: 4px;
+        background-color: white;
+        -webkit-transition: 0.4s;
+        transition: 0.4s;
+      }
+
+      input:checked + .slider {
+        background-color: #2196f3;
+      }
+
+      input:focus + .slider {
+        box-shadow: 0 0 1px #2196f3;
+      }
+
+      input:checked + .slider:before {
+        -webkit-transform: translateX(26px);
+        -ms-transform: translateX(26px);
+        transform: translateX(26px);
+      }
+
+      /* Rounded sliders */
+      .slider.round {
+        border-radius: 34px;
+      }
+
+      .slider.round:before {
+        border-radius: 50%;
+      }
+
+      .divider {
+        border-top: solid 1px #ccc;
+        margin-top: 20px;
+        height: 20px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="header">
+      <h1>PolyWrite2 Pro</h1>
+      <div
+        style="display: flex; direction: row; align-items: center; gap: 20px"
+      >
+        <h4>Enable Autosave</h4>
+        <label class="switch">
+          <input id="enable_autosave" type="checkbox" checked />
+          <span class="slider round"></span>
+        </label>
+      </div>
+    </div>
+    <div id="editor-container">
+      <div class="editor-container">
+        <div class="toolbar">
+          <button id="boldButton1">Bold</button>
+          <button id="italicButton1">Italic</button>
+          <button id="underlineButton1">Underline</button>
+          <button id="linkButton1">Link</button>
+        </div>
+        <div id="editor1" class="editor" contenteditable="true"></div>
+        <div>
+          <button id="save-button1" class="button">Save</button>
+          <button id="download-button1" class="button">Download</button>
+          <button id="clear-button1" class="button">Clear</button>
+        </div>
+        <ul id="file-list-editor1" class="file-list"></ul>
+      </div>
+      <div class="column-container">
+        <div class="column">
+          <div class="editor-container">
+            <div class="toolbar">
+              <button id="boldButton2">Bold</button>
+              <button id="italicButton2">Italic</button>
+              <button id="underlineButton2">Underline</button>
+              <button id="linkButton2">Link</button>
+            </div>
+            <div id="editor2" class="editor" contenteditable="true"></div>
+            <div>
+              <button id="save-button2" class="button">Save</button>
+              <button id="download-button2" class="button">Download</button>
+              <button id="clear-button2" class="button">Clear</button>
+            </div>
+            <ul id="file-list-editor2" class="file-list"></ul>
+          </div>
+        </div>
+        <div class="column">
+          <div class="editor-container">
+            <div class="toolbar">
+              <button id="boldButton3">Bold</button>
+              <button id="italicButton3">Italic</button>
+              <button id="underlineButton3">Underline</button>
+              <button id="linkButton3">Link</button>
+            </div>
+            <div id="editor3" class="editor" contenteditable="true"></div>
+            <div>
+              <button id="save-button3" class="button">Save</button>
+              <button id="download-button3" class="button">Download</button>
+              <button id="clear-button3" class="button">Clear</button>
+            </div>
+            <ul id="file-list-editor3" class="file-list"></ul>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div id="additional-editors"></div>
+    <div class="divider"></div>
+    <div>
+      <button id="add-editor-button" class="button">Add New Editor</button>
+      <button id="download-all-button" class="button">Download All</button>
+      <button id="load-all-button" class="button">Load All</button>
+    </div>
+
+    <script>
+      var editorIDs = ["editor1", "editor2", "editor3"];
+      var activeFilenames = [];
+      var enableAutosave = true;
+
+      function removeDuplicatesAndSort(array) {
+        array.sort((a, b) => a - b);
+        const uniqueSet = new Set(array);
+        const uniqueArray = Array.from(uniqueSet).sort((a, b) => a - b);
+        return uniqueArray;
+      }
+
+      function getDateTimeString(date) {
+        const day = date.getDate().toString().padStart(2, "0");
+        const month = (date.getMonth() + 1).toString().padStart(2, "0");
+        const year = date.getFullYear().toString().padStart(2, "0");
+        const hours = date.getHours().toString().padStart(2, "0");
+        const minutes = date.getMinutes().toString().padStart(2, "0");
+        const seconds = date.getSeconds().toString().padStart(2, "0");
+        const timeString =
+          year +
+          "-" +
+          month +
+          "-" +
+          day +
+          " " +
+          hours +
+          ":" +
+          minutes +
+          ":" +
+          seconds;
+        return timeString;
+      }
+
+      function execCommand(command, value = null) {
+        document.execCommand(command, false, value);
+      }
+
+      function initializeEditors() {
+        // validation check
+        let recentValidatedObject = {};
+        let invalidKeys = [];
+        for (var key in localStorage) {
+          if (key.match(/editor\d+-.*/)) {
+            const parts = key.match(/(editor\d+)-(.*)/).slice(1);
+            if (parts.length !== 2) {
+              invalidKeys.push(key);
+              continue;
+            }
+            const editorID = parts[0];
+            const filename = parts[1];
+            const data = localStorage.getItem(key);
+            if (!data) {
+              invalidKeys.push(key);
+              continue;
+            }
+            const fileData = JSON.parse(data);
+            const fileKeys = Object.keys(fileData);
+            if (
+              fileKeys.includes("content") &&
+              fileKeys.includes("lastModified")
+            ) {
+              const lastModified = fileData.lastModified;
+              if (key in Object.keys(recentValidatedObject)) {
+                const newDate = new Date(lastModified).getTime();
+                const originalDate = new Date(
+                  recentValidatedObject[key].lastModified
+                ).getTime();
+                if (newDate >= originalDate)
+                  recentValidatedObject[key] = fileData;
+              } else {
+                recentValidatedObject[key] = fileData;
+                editorIDs.push(editorID);
+              }
+            } else {
+              invalidKeys.push(key);
+            }
+          }
+        }
+        for (var key of invalidKeys) {
+          localStorage.removeItem(key);
+        }
+        editorIDs = removeDuplicatesAndSort(editorIDs);
+        for (var editorID of editorIDs) {
+          const matches = editorID.match(/editor(\d+)/).slice(1);
+          if (matches) {
+            var id = matches[0];
+            if (id > 3) {
+              const editorContainer = createEditor(id);
+              document
+                .getElementById("additional-editors")
+                .appendChild(editorContainer);
+            }
+            addEditorButtonListeners(id);
+            updateFileList(editorID);
+          }
+        }
+      }
+
+      // Helper function to save content automatically every 5 mins
+      function autosaveContent(editorID, isManuallySaved = false) {
+        if (!enableAutosave) return;
+        const fileContent = document.getElementById(editorID).innerHTML;
+        if (!fileContent) return;
+
+        let filename = editorID + "-" + "autosave";
+        const activeFilenamesOfThisEditor = activeFilenames.filter((element) =>
+          element.startsWith(editorID)
+        );
+        if (activeFilenamesOfThisEditor.length > 0 && !isManuallySaved) {
+          filename = activeFilenamesOfThisEditor[0];
+        }
+        const lastModified = new Date().getTime();
+        localStorage.setItem(
+          filename,
+          JSON.stringify({ content: fileContent, lastModified })
+        );
+        updateFileList(editorID);
+      }
+
+      // Helper function to save content
+      function saveContent(editorID) {
+        const fileContent = document.getElementById(editorID).innerHTML;
+        if (!fileContent) {
+          alert("Nothing to save");
+          return;
+        }
+        const filename = prompt("Enter file name for " + editorID);
+        if (filename) {
+          if (Object.keys(localStorage).includes(editorID + "-" + filename)) {
+            if (
+              !confirm(filename + " already exists. Do you want to overwrite?")
+            )
+              return;
+          }
+          const lastModified = new Date().getTime();
+          localStorage.setItem(
+            editorID + "-" + filename,
+            JSON.stringify({ content: fileContent, lastModified })
+          );
+          activeFilenames = activeFilenames.filter(
+            (element) => !element.startsWith(editorID)
+          );
+          activeFilenames.push(editorID + "-" + filename);
+          autosaveContent(editorID, true);
+          updateFileList(editorID);
+        }
+      }
+
+      // Helper function to download content
+      function downloadContent(editorID) {
+        var fileContent = document.getElementById(editorID).innerHTML;
+        var blob = new Blob([fileContent], { type: "text/html" });
+        var url = URL.createObjectURL(blob);
+        var a = document.createElement("a");
+        a.href = url;
+        a.download = editorID + ".html";
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      }
+
+      // Helper function to clear content
+      function clearContent(editorID) {
+        document.getElementById(editorID).innerHTML = "";
+        const activeFilenamesOfThisEditor = activeFilenames.filter((element) =>
+          element.startsWith(editorID)
+        );
+        if (activeFilenamesOfThisEditor.length > 0) {
+          const data = localStorage.getItem(activeFilenamesOfThisEditor[0]);
+          const fileData = JSON.parse(data);
+          document.getElementById(editorID).innerHTML = fileData.content;
+        }
+      }
+
+      function createEditor(id) {
+        const editorContainer = document.createElement("div");
+        editorContainer.className = "editor-container";
+
+        const toolbar = document.createElement("div");
+        toolbar.className = "toolbar";
+        editorContainer.appendChild(toolbar);
+
+        const boldButton = document.createElement("button");
+        boldButton.textContent = "Bold";
+        boldButton.id = "boldButton" + id;
+        toolbar.appendChild(boldButton);
+
+        const italicButton = document.createElement("button");
+        italicButton.textContent = "Italic";
+        italicButton.id = "italicButton" + id;
+        toolbar.appendChild(italicButton);
+
+        const underlineButton = document.createElement("button");
+        underlineButton.textContent = "Underline";
+        underlineButton.id = "underlineButton" + id;
+        toolbar.appendChild(underlineButton);
+
+        const linkButton = document.createElement("button");
+        linkButton.textContent = "Link";
+        linkButton.id = "linkButton" + id;
+        toolbar.appendChild(linkButton);
+
+        const editor = document.createElement("div");
+        editor.id = "editor" + id;
+        editor.className = "editor";
+        editor.contentEditable = true;
+        editorContainer.appendChild(editor);
+
+        const buttonContainer = document.createElement("div");
+        editorContainer.appendChild(buttonContainer);
+
+        const saveButton = document.createElement("button");
+        saveButton.className = "button";
+        saveButton.textContent = "Save";
+        saveButton.id = "save-button" + id;
+        buttonContainer.appendChild(saveButton);
+
+        const downloadButton = document.createElement("button");
+        downloadButton.className = "button";
+        downloadButton.textContent = "Download";
+        downloadButton.id = "download-button" + id;
+        buttonContainer.appendChild(downloadButton);
+
+        const clearButton = document.createElement("button");
+        clearButton.className = "button";
+        clearButton.textContent = "Clear";
+        clearButton.id = "clear-button" + id;
+        buttonContainer.appendChild(clearButton);
+
+        const removeButton = document.createElement("button");
+        removeButton.className = "remove-editor-button";
+        removeButton.textContent = "Remove Editor";
+        removeButton.setAttribute("editor", id);
+        removeButton.addEventListener("click", function () {
+          const id = this.getAttribute("editor");
+          removeEditor(editorContainer, id);
+          editorIDs = editorIDs.filter((element) => element !== "editor" + id);
+        });
+        buttonContainer.appendChild(removeButton);
+
+        const fileList = document.createElement("ul");
+        fileList.id = "file-list-" + "editor" + id;
+        fileList.className = "file-list";
+        editorContainer.appendChild(fileList);
+
+        return editorContainer;
+      }
+
+      function removeEditor(editorContainer, id) {
+        if (confirm("Are you sure you want to remove this editor?")) {
+          editorContainer.remove();
+          for (var key in localStorage) {
+            if (key.startsWith("editor" + id)) {
+              localStorage.removeItem(key);
+              activeFilenames = activeFilenames.filter(
+                (element) => !element.startsWith(key)
+              );
+            }
+          }
+        }
+      }
+
+      function updateFileList(editorID) {
+        var fileList = document.getElementById("file-list-" + editorID);
+        fileList.innerHTML = "";
+        for (var key in localStorage) {
+          if (key.match(/editor\d+-.*/)) {
+            const parts = key.match(/(editor\d+)-(.*)/).slice(1);
+            if (parts.length !== 2) continue;
+            if (parts[0] !== editorID) continue;
+            const filename = parts[1];
+            if (!enableAutosave && filename === "autosave") continue;
+            var li = document.createElement("li");
+            li.setAttribute("contenteditable", "false");
+            li.setAttribute("filename", filename);
+            li.setAttribute("editor", editorID);
+            if (activeFilenames.includes(key)) {
+              li.className = "active-file";
+            }
+            li.addEventListener("click", function () {
+              const editorID = this.getAttribute("editor");
+              const filename = this.getAttribute("filename");
+              const data = localStorage.getItem(editorID + "-" + filename);
+              if (!data) return;
+              const fileData = JSON.parse(data);
+              document.getElementById(editorID).innerHTML = fileData.content;
+              activeFilenames = activeFilenames.filter(
+                (element) => !element.startsWith(editorID)
+              );
+              activeFilenames.push(editorID + "-" + filename);
+              for (element of this.parentNode.children) {
+                var element_editorID = element.getAttribute("editor");
+                var element_filename = element.getAttribute("filename");
+                if (
+                  !activeFilenames.includes(
+                    element_editorID + "-" + element_filename
+                  )
+                ) {
+                  element.className = "";
+                } else {
+                  element.className = "active-file";
+                }
+              }
+            });
+            if (filename !== "autosave") {
+              var renameButton = document.createElement("button");
+              renameButton.textContent = "Rename";
+              renameButton.setAttribute("filename", filename);
+              renameButton.setAttribute("editor", editorID);
+              renameButton.addEventListener("click", function (event) {
+                event.stopPropagation();
+                var editorID = this.getAttribute("editor");
+                var oldFileName = this.getAttribute("filename");
+                var newFileName = prompt(
+                  "Enter the new file name",
+                  oldFileName
+                );
+                if (newFileName && newFileName !== oldFileName) {
+                  var fileContent = localStorage.getItem(
+                    editorID + "-" + oldFileName
+                  );
+                  localStorage.removeItem(editorID + "-" + oldFileName);
+                  localStorage.setItem(
+                    editorID + "-" + newFileName,
+                    fileContent
+                  );
+                  activeFilenames = activeFilenames.filter(
+                    (element) =>
+                      !element.startsWith(editorID + "-" + oldFileName)
+                  );
+                  activeFilenames.push(editorID + "-" + newFileName);
+                  updateFileList(editorID);
+                }
+              });
+
+              var deleteButton = document.createElement("button");
+              deleteButton.textContent = "Delete";
+              deleteButton.setAttribute("filename", filename);
+              deleteButton.setAttribute("editor", editorID);
+              deleteButton.addEventListener("click", function (event) {
+                event.stopPropagation();
+                var editorID = this.getAttribute("editor");
+                var filename = this.getAttribute("filename");
+                if (confirm("Are you sure you want to delete this file?")) {
+                  localStorage.removeItem(editorID + "-" + filename);
+                  activeFilenames = activeFilenames.filter(
+                    (element) => !element.startsWith(editorID + "-" + filename)
+                  );
+                  clearContent(editorID);
+                  updateFileList(editorID);
+                }
+              });
+            }
+
+            var moveUpButton = document.createElement("button");
+            moveUpButton.textContent = "▲";
+            moveUpButton.setAttribute("filename", filename);
+            moveUpButton.setAttribute("editor", editorID);
+            moveUpButton.addEventListener("click", function (event) {
+              event.stopPropagation();
+              var editorID = this.getAttribute("editor");
+              var filename = this.getAttribute("filename");
+              var fileList = document.getElementById("file-list-" + editorID);
+              var listItems = fileList.getElementsByTagName("li");
+              for (var i = 1; i < listItems.length; i++) {
+                if (listItems[i].textContent.includes(filename)) {
+                  fileList.insertBefore(listItems[i], listItems[i - 1]);
+                  break;
+                }
+              }
+            });
+
+            var moveDownButton = document.createElement("button");
+            moveDownButton.textContent = "▼";
+            moveDownButton.setAttribute("filename", filename);
+            moveDownButton.setAttribute("editor", editorID);
+            moveDownButton.addEventListener("click", function (event) {
+              event.stopPropagation();
+              var editorID = this.getAttribute("editor");
+              var filename = this.getAttribute("filename");
+              var fileList = document.getElementById("file-list-" + editorID);
+              var listItems = fileList.getElementsByTagName("li");
+              for (var i = 0; i < listItems.length - 1; i++) {
+                if (listItems[i].textContent.includes(filename)) {
+                  fileList.insertBefore(listItems[i + 1], listItems[i]);
+                  break;
+                }
+              }
+            });
+
+            var filenameSpan = document.createElement("span");
+            filenameSpan.textContent = filename;
+            li.appendChild(filenameSpan);
+
+            let lastModified = "-";
+            const data = localStorage.getItem(editorID + "-" + filename);
+            if (data) {
+              const fileData = JSON.parse(data);
+              lastModified = fileData.lastModified;
+            }
+            var lastModifiedSpan = document.createElement("span");
+            lastModifiedSpan.textContent =
+              "Last Modified: " + getDateTimeString(new Date(lastModified));
+            lastModifiedSpan.className = "last-modified";
+
+            var fileActions = document.createElement("div");
+            fileActions.className = "file-actions";
+            fileActions.appendChild(lastModifiedSpan);
+            if (filename !== "autosave") {
+              fileActions.appendChild(renameButton);
+              fileActions.appendChild(deleteButton);
+            }
+            fileActions.appendChild(moveUpButton);
+            fileActions.appendChild(moveDownButton);
+            li.appendChild(fileActions);
+            fileList.appendChild(li);
+          }
+        }
+        if (!fileList.innerHTML) {
+          fileList.style.display = "none";
+        } else {
+          fileList.style.display = "block";
+        }
+      }
+
+      // Event listeners for editor 1
+      function addEditorButtonListeners(editorID) {
+        document
+          .getElementById(`boldButton${editorID}`)
+          .addEventListener("click", function () {
+            execCommand("bold");
+          });
+        document
+          .getElementById(`italicButton${editorID}`)
+          .addEventListener("click", function () {
+            execCommand("italic");
+          });
+        document
+          .getElementById(`underlineButton${editorID}`)
+          .addEventListener("click", function () {
+            execCommand("underline");
+          });
+        document
+          .getElementById(`linkButton${editorID}`)
+          .addEventListener("click", function () {
+            var url = prompt("Enter the URL");
+            execCommand("createLink", url);
+          });
+        document
+          .getElementById(`save-button${editorID}`)
+          .addEventListener("click", function () {
+            saveContent(`editor${editorID}`);
+          });
+        document
+          .getElementById(`download-button${editorID}`)
+          .addEventListener("click", function () {
+            downloadContent(`editor${editorID}`);
+          });
+        document
+          .getElementById(`clear-button${editorID}`)
+          .addEventListener("click", function () {
+            clearContent(`editor${editorID}`);
+          });
+      }
+
+      // Add event listeners for each editor
+
+      document
+        .getElementById("add-editor-button")
+        .addEventListener("click", function () {
+          let maxID = 0;
+          for (editorID of editorIDs) {
+            const matches = editorID.match(/editor(\d+)/).slice(1);
+            if (matches) {
+              const id = matches[0];
+              if (maxID < id) maxID = id;
+            }
+          }
+          const newID = parseInt(maxID) + 1;
+          const editorContainer = createEditor(newID);
+          editorIDs.push("editor" + newID);
+          document
+            .getElementById("additional-editors")
+            .appendChild(editorContainer);
+          addEditorButtonListeners(newID);
+          updateFileList("editor" + newID);
+        });
+
+      document
+        .getElementById("download-all-button")
+        .addEventListener("click", function () {
+          let content = "";
+          for (let editorID of editorIDs) {
+            content += "=== " + editorID + " ===\n";
+            content += document.getElementById(editorID).innerHTML + "\n\n";
+          }
+          const blob = new Blob([content], { type: "text/plain" });
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement("a");
+          a.href = url;
+          a.download = "polywrite2_pro_content.txt";
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          URL.revokeObjectURL(url);
+        });
+
+      document
+        .getElementById("load-all-button")
+        .addEventListener("click", function () {
+          const input = document.createElement("input");
+          input.type = "file";
+          input.accept = "text/plain";
+          input.onchange = function (event) {
+            const file = event.target.files[0];
+            const reader = new FileReader();
+            reader.onload = function (event) {
+              const content = event.target.result;
+              const sections = content.split("=== ");
+              for (let i = 1; i < sections.length; i++) {
+                const editorID = sections[i].split(" ===")[0];
+                const editorContent = sections[i]
+                  .split("\n")
+                  .slice(1)
+                  .join("\n")
+                  .trim();
+                if (editorIDs.includes(editorID)) {
+                  document.getElementById(editorID).innerHTML = editorContent;
+                }
+              }
+            };
+            reader.readAsText(file);
+          };
+          input.click();
+        });
+
+      document
+        .getElementById("enable_autosave")
+        .addEventListener("change", function (event) {
+          enableAutosave = event.target.checked;
+          for (let editorID of editorIDs) {
+            updateFileList(editorID);
+            activeFilenames = activeFilenames.filter(
+              (element) => element !== editorID + "-autosave"
+            );
+          }
+        });
+
+      // Call autosaveContent every 5 minutes for each editor
+      setInterval(function () {
+        for (var editorID of editorIDs) {
+          autosaveContent(editorID);
+        }
+      }, 30000);
+      // initialize editors events
+      initializeEditors();
+    </script>
+  </body>
+</html>

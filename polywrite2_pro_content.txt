@@ -1,0 +1,12 @@
+=== editor1 ===
+<div>IDEAS TO ADD @ 10:36PM</div><div><br></div><div>- Terminal Window to Run Task and-or khal</div><div><br></div><div>- Random Number Generator and-or Random Text Generator</div><div><br></div><div>- Additional Font dropdowns and options / Formatting Features</div><div><br></div><div>- Movable Auto-Sizing Text Editor Frames</div><div><br></div><div>- Strenuous Testing of Additional Text Frames</div><div><br></div><div>- Consider adding internal bookmarking or folder implemantion</div><div>&nbsp;</div><div>- Package with multi-platform Sidekick preset</div><div><br></div><div>- Line numbers</div><div><br></div><div>- Title area for each text editor displaying the current file's name as saved</div><div><br></div><div>- (Basic Image Handling)</div><div>-- (Attachments?\</div><div><br></div><div><br></div><div>--------</div><div><br></div><div>Errors + Pre-Requested Additions:</div><div><br></div><div>Autosave seems to overwrite the movement of items saved for each editor's file list.</div><div><br></div><div>Clear All and a Reset button</div><div><br></div><div>----------------------------------------------------- New Post save added Section for testing @4:51pm May 7 - Note created yesterday</div><div>@4:56PM See that the Autosave split created an automatic saved derivation. nice, Can we clarify what that "means" for the End User?</div><div><br></div><div><br></div><div>-&nbsp;</div><div><br></div><div><br></div><div><br></div><div><br></div><div><br></div><div><br></div><div><br></div>
+
+=== editor2 ===
+<div><div>CWSA May 7</div></div><div><br></div><div>Negative Space Pre-Priming</div><div><br></div><div>Physical tic-tac persuasion</div><div><br></div><div>How does this affect biological attention -- frequency, novelty, danger, attention, priming, negative priming, physical endurance factors, complexity,&nbsp;</div>
+
+=== editor3 ===
+Testing May 7 4:49Pm Testing<div><br></div><div>AUTOSAVE AND NAMING TEST</div><div><br></div><div><br></div>
+
+=== editor4 ===
+Test 4 Day 2<div><br></div><div>Added new Text Editor</div><div><br></div><div>Adding items to check - and bug fixes</div><div><br></div><div>Checking link test @ 10:45am</div><div><a href="https://youtu.be/oQpFHQRbqcw">https://youtu.be/oQpFHQRbqcw</a><br></div><div><br></div><div>Shared and now saved @ 11:26am</div><div><br></div><div><a href="https://youtu.be/oQpFHQRbqcw">https://youtu.be/oQpFHQRbqcw</a><br></div>
+
